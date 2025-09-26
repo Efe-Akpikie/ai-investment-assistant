@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getCacheWithFallback } from '@/lib/redis'
-import { query } from '@/lib/db'
 
 // Mock S&P 500 data for development
 const mockSP500Data = [
@@ -195,27 +193,21 @@ export async function GET(request: NextRequest) {
 
     // For development, return mock data
     // In production, this would fetch from the Python service
-    const cacheKey = `sp500:${limit}:${sortBy}:${sortOrder}`
     
-    const data = await getCacheWithFallback(
-      cacheKey,
-      async () => {
-        // Sort the mock data
-        const sortedData = [...mockSP500Data].sort((a, b) => {
-          const aValue = a[sortBy as keyof typeof a] as number
-          const bValue = b[sortBy as keyof typeof b] as number
-          
-          if (sortOrder === 'desc') {
-            return bValue - aValue
-          } else {
-            return aValue - bValue
-          }
-        })
+    // Sort the mock data
+    const sortedData = [...mockSP500Data].sort((a, b) => {
+      const aValue = a[sortBy as keyof typeof a] as number
+      const bValue = b[sortBy as keyof typeof b] as number
+      
+      if (sortOrder === 'desc') {
+        return bValue - aValue
+      } else {
+        return aValue - bValue
+      }
+    })
 
-        return sortedData.slice(0, limit)
-      },
-      900 // 15 minutes cache
-    )
+    // Apply limit
+    const data = sortedData.slice(0, limit)
 
     return NextResponse.json({
       success: true,

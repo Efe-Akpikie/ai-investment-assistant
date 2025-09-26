@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getCacheWithFallback } from '@/lib/redis'
 
 // Mock portfolio data for development
 const mockPortfolio = {
@@ -71,19 +70,9 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('userId') || 'user-123'
 
-    const cacheKey = `portfolio:${userId}`
-    
-    const data = await getCacheWithFallback(
-      cacheKey,
-      async () => {
-        return mockPortfolio
-      },
-      300 // 5 minutes cache
-    )
-
     return NextResponse.json({
       success: true,
-      data
+      data: mockPortfolio
     })
   } catch (error) {
     console.error('Error fetching portfolio:', error)

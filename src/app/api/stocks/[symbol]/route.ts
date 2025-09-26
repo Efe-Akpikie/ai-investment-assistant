@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getCacheWithFallback } from '@/lib/redis'
 
 // Mock stock data for development
 const mockStockData = {
@@ -115,35 +114,28 @@ export async function GET(
     const timeframe = searchParams.get('timeframe') || '1M'
     const includeChart = searchParams.get('includeChart') === 'true'
 
-    const cacheKey = `stock:${symbol}:${timeframe}:${includeChart}`
+    const stockData = mockStockData[symbol.toUpperCase() as keyof typeof mockStockData]
     
-    const data = await getCacheWithFallback(
-      cacheKey,
-      async () => {
-        const stockData = mockStockData[symbol.toUpperCase() as keyof typeof mockStockData]
-        
-        if (!stockData) {
-          throw new Error('Stock not found')
-        }
+    if (!stockData) {
+      return NextResponse.json(
+        { success: false, error: 'Stock not found' },
+        { status: 404 }
+      )
+    }
 
-        const result: any = { ...stockData }
-        
-        if (includeChart) {
-          result.chartData = {
-            symbol: symbol.toUpperCase(),
-            timeframe,
-            data: generateMockChartData(symbol.toUpperCase(), timeframe)
-          }
-        }
-
-        return result
-      },
-      300 // 5 minutes cache
-    )
+    const result: any = { ...stockData }
+    
+    if (includeChart) {
+      result.chartData = {
+        symbol: symbol.toUpperCase(),
+        timeframe,
+        data: generateMockChartData(symbol.toUpperCase(), timeframe)
+      }
+    }
 
     return NextResponse.json({
       success: true,
-      data
+      data: result
     })
   } catch (error) {
     console.error(`Error fetching stock data for ${params.symbol}:`, error)

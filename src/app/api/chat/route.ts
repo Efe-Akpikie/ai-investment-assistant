@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateInvestmentAdvice, analyzeChartPattern, analyzeImage } from '@/lib/openai'
-import { getCacheWithFallback } from '@/lib/redis'
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,15 +27,7 @@ export async function POST(request: NextRequest) {
 
     // Handle image analysis
     if (image) {
-      const cacheKey = `chat:image:${symbol || 'general'}:${message?.slice(0, 50) || 'image'}`
-      
-      const response = await getCacheWithFallback(
-        cacheKey,
-        async () => {
-          return await analyzeImage(image, message, symbol, context)
-        },
-        1800 // 30 minutes cache
-      )
+      const response = await analyzeImage(image, message, symbol, context)
 
       return NextResponse.json({
         success: true,
@@ -50,15 +41,7 @@ export async function POST(request: NextRequest) {
 
     // Check if this is a chart analysis request
     if (context?.chartData && symbol) {
-      const cacheKey = `chat:chart:${symbol}:${message.slice(0, 50)}`
-      
-      const response = await getCacheWithFallback(
-        cacheKey,
-        async () => {
-          return await analyzeChartPattern(symbol, context.chartData, message)
-        },
-        1800 // 30 minutes cache
-      )
+      const response = await analyzeChartPattern(symbol, context.chartData, message)
 
       return NextResponse.json({
         success: true,
@@ -72,15 +55,7 @@ export async function POST(request: NextRequest) {
 
     // Regular investment advice
     if (symbol && context?.stockData) {
-      const cacheKey = `chat:advice:${symbol}:${message.slice(0, 50)}`
-      
-      const response = await getCacheWithFallback(
-        cacheKey,
-        async () => {
-          return await generateInvestmentAdvice(symbol, context.stockData, message)
-        },
-        1800 // 30 minutes cache
-      )
+      const response = await generateInvestmentAdvice(symbol, context.stockData, message)
 
       return NextResponse.json({
         success: true,
@@ -93,13 +68,7 @@ export async function POST(request: NextRequest) {
     }
 
     // General investment question
-    const cacheKey = `chat:general:${message.slice(0, 50)}`
-    
-    const response = await getCacheWithFallback(
-      cacheKey,
-      async () => {
-        // For general questions, provide educational content
-        return `I'm here to help with investment-related questions! However, for the most accurate and personalized advice, I recommend:
+    const response = `I'm here to help with investment-related questions! However, for the most accurate and personalized advice, I recommend:
 
 1. **Consulting with a licensed financial advisor** who can assess your specific situation
 2. **Researching specific stocks** using our stock analysis tools
@@ -112,9 +81,6 @@ For specific stock analysis, please search for a stock symbol and ask questions 
 - Risk assessment and portfolio considerations
 
 What specific stock or investment topic would you like to explore?`
-      },
-      3600 // 1 hour cache
-    )
 
     return NextResponse.json({
       success: true,
