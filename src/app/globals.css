@@ -1,26 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Light, clean white/blue palette (HSL values) */
+  --background: 0 0% 100%;          /* white */
+  --foreground: 222.2 47.4% 11.2%;  /* slate-900 */
+
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 47.4% 11.2%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 47.4% 11.2%;
+
+  --primary: 217 91% 60%;           /* blue-500 */
+  --primary-foreground: 0 0% 100%;   /* white */
+
+  --secondary: 214 32% 91%;          /* slate-200 */
+  --secondary-foreground: 222.2 47.4% 11.2%;
+
+  --muted: 214 32% 91%;
+  --muted-foreground: 215 16% 47%;   /* slate-500 */
+
+  --accent: 213 100% 97%;            /* blue-50 */
+  --accent-foreground: 222.2 47.4% 11.2%;
+
+  --destructive: 0 84% 60%;          /* red-500 */
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  --ring: 217 91% 60%;
+  --radius: 0.5rem;
+
+  /* Charts */
+  --chart-1: 217 91% 60%;
+  --chart-2: 160 84% 39%;   /* green */
+  --chart-3: 0 84% 60%;     /* red */
+  --chart-4: 45 93% 47%;    /* amber */
+  --chart-5: 251 95% 67%;   /* violet */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: hsl(var(--border));
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: 'Inter', system-ui, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--secondary));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
+}
+
+/* Loading animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Chart animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chart-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Fix text overlay issues */
+* {
+  text-shadow: none !important;
+  -webkit-text-stroke: 0px !important;
+}
+
+.font-semibold {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transform: translateZ(0);
+  position: relative;
+  z-index: 1;
 }

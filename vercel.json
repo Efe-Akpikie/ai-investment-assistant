@@ -1,0 +1,38 @@
+{
+  "functions": {
+    "src/app/api/**/*.ts": {
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "DATABASE_URL": "@database-url",
+    "REDIS_URL": "@redis-url", 
+    "OPENAI_API_KEY": "@openai-api-key",
+    "PYTHON_SERVICE_URL": "@python-service-url"
+  },
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_APP_URL": "@app-url"
+    }
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization"
+        }
+      ]
+    }
+  ]
+}
+
